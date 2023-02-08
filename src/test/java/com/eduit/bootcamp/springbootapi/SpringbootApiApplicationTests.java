@@ -1,9 +1,10 @@
 package com.eduit.bootcamp.springbootapi;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
-@SpringBootTest
+@RunWith(JUnit4.class)
 class SpringbootApiApplicationTests {
 
 	@Test
