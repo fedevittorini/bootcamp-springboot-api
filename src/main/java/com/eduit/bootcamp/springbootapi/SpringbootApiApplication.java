@@ -18,5 +18,7 @@ public class SpringbootApiApplication {
 		ConfigurableApplicationContext ctx = SpringApplication.run(SpringbootApiApplication.class, args);
 	}
 	public SpringbootApiApplication(){}
-	public void mm() {}
+	public void mm() {
+		System.out.print("A");
+	}
 }
