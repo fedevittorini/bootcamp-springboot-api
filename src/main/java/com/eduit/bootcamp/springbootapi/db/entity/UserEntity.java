@@ -39,7 +39,10 @@ public class UserEntity {
 	
 	@Column(name = "last_name", nullable = false)
 	private String lastName;
-		
+	
+	@Column(nullable = false)
+	private String email;
+	
 	@Column(nullable = false)
 	private String password;
 	
@@ -104,6 +107,14 @@ public class UserEntity {
 			throw new IllegalArgumentException("The password length should be between 6 an 12 chars length");
 		}
 		this.password = password;
+	}
+	
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public Date getDateCreated() {

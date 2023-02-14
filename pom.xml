@@ -6,20 +6,18 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.7.8</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.eduit.bootcamp</groupId>
 	<artifactId>springboot-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>springboot-api</name>
 	<description>Demo project for Spring Boot</description>
-	
 	<properties>
 		<java.version>11</java.version>
 		<openapi.version>1.6.4</openapi.version>
 		<mainclass>com.eduit.bootcamp.springbootapi.SpringbootApiApplication</mainclass>
 	</properties>
-	
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -31,9 +29,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -44,13 +45,34 @@
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		
-		<!-- Not proivded by spring initializer -->		
+		<!-- Not proivded by spring initializer -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
 			<version>${openapi.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-data-rest</artifactId>
+			<version>${openapi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-javadoc</artifactId>
+			<version>${openapi.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.openapitools/jackson-databind-nullable -->
+		<dependency>
+		    <groupId>org.openapitools</groupId>
+		    <artifactId>jackson-databind-nullable</artifactId>
+		    <version>0.2.4</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
@@ -59,26 +81,24 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-	        <groupId>org.mockito</groupId>
-	        <artifactId>mockito-core</artifactId>
-	        <scope>test</scope>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
 		</dependency>
-		<!-- END Not proivded by spring initializer -->	
-		
-		
+		<!-- END Not proivded by spring initializer -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -88,7 +108,32 @@
 					<mainClass>${mainclass}</mainClass>
 				</configuration>
 			</plugin>
+			<plugin>
+			    <groupId>org.openapitools</groupId>
+			    <artifactId>openapi-generator-maven-plugin</artifactId>
+			    <!-- RELEASE_VERSION -->
+			    <version>6.0.0</version>
+			    <!-- /RELEASE_VERSION -->
+			    <executions>
+			        <execution>
+			            <goals>
+			                <goal>generate</goal>
+			            </goals>
+			            <configuration>
+			                <inputSpec>${project.basedir}/src/main/resources/rest-contract.yaml</inputSpec>
+			                <generatorName>spring</generatorName>
+			                <apiPackage>com.eduit.bootcamp.springbootapi.api</apiPackage>
+                			<modelPackage>com.eduit.bootcamp.springbootapi.model</modelPackage>
+                			<ignoreFileOverride>${project.basedir}/src/swagger/ignore</ignoreFileOverride>
+			                <configOptions>
+								<dateLibrary>java8</dateLibrary>
+								<delegatePattern>true</delegatePattern>
+			                	<sourceFolder>src/gen/java/main</sourceFolder>
+			                </configOptions>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
 		</plugins>
 	</build>
-
 </project>

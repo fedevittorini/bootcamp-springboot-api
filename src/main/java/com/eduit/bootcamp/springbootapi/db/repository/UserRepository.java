@@ -1,10 +1,12 @@
 package com.eduit.bootcamp.springbootapi.db.repository;
 
-import org.springframework.data.repository.Repository;
+import java.util.Optional;
+
+import org.springframework.data.repository.CrudRepository;
 
 import com.eduit.bootcamp.springbootapi.db.entity.UserEntity;
 
-public interface UserRepository extends Repository<UserEntity, Long> {
+public interface UserRepository extends CrudRepository<UserEntity, Long> {
 
-	UserEntity findOneByUsername(String username);
+	Optional<UserEntity> findOneByUsername(String username);
 }
