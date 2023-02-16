@@ -1,6 +1,6 @@
 package com.eduit.bootcamp.springbootapi.db.entity;
 
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,7 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.apache.commons.lang3.Validate;
 
@@ -102,7 +101,7 @@ public class UserEntity {
 	 * @param password the Password, It cannot be null or blank and should be between 6 an 12 chars.
 	 */
 	public void setPassword(String password) {
-		Validate.notBlank(firstName, "The password cannot be null or blank");
+		Validate.notBlank(password, "The password cannot be null or blank");
 		if (password.length() < 6 || password.length() > 12 ) {
 			throw new IllegalArgumentException("The password length should be between 6 an 12 chars length");
 		}

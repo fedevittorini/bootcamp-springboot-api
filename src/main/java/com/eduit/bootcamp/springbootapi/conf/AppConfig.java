@@ -15,8 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.eduit.bootcamp.springbootapi.controller.ProductController;
 import com.eduit.bootcamp.springbootapi.controller.UserController;
 import com.eduit.bootcamp.springbootapi.db.repository.UserRepository;
+import com.eduit.bootcamp.springbootapi.service.UserAdministrationService;
+import com.eduit.bootcamp.springbootapi.service.UserAdministrationServiceImpl;
 import com.eduit.bootcamp.springbootapi.service.UserAuthenticationService;
 import com.eduit.bootcamp.springbootapi.service.UserAuthenticationServiceImpl;
 
@@ -24,12 +27,12 @@ import com.eduit.bootcamp.springbootapi.service.UserAuthenticationServiceImpl;
 public class AppConfig {
 
 
-	@Value("${security.secret}")
+	@Value("${jwt.secret}")
 	private String secretAuth;
 
 	@Autowired
 	ApplicationContext context;
-	
+
     @Bean
     public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails user = User.withUsername("user")
@@ -44,7 +47,6 @@ public class AppConfig {
 
         return new InMemoryUserDetailsManager(user, admin);
     }
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
@@ -54,14 +56,25 @@ public class AppConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-    	int strength = 10; // work factor of bcrypt
-    	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(strength, new SecureRandom());
+       int strength = 10; // work factor of bcrypt
+       BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(strength, new SecureRandom());
         return encoder;
     }
+    
+	@Bean
+	public UserController getUserController(UserAuthenticationService userAuthenticationService, 
+			UserAdministrationService userAdministrationService) {
+		return new UserController(userAdministrationService, userAuthenticationService);
+	}
 	
 	@Bean
-	public UserController getUserController(UserAuthenticationService userAuthenticationService) {
-		return new UserController(userAuthenticationService);
+	public ProductController getProductController() {
+		return new ProductController();
+	}
+	
+	@Bean
+	public UserAdministrationService getUserAdministrationService(UserRepository userRepository) {
+		return new UserAdministrationServiceImpl(userRepository);
 	}
 	
 	@Bean

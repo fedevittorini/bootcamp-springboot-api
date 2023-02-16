@@ -32,13 +32,6 @@ paths:
       summary: Create user
       description: This can only be done by the logged in user.
       operationId: createUser
-      parameters:
-        - name: Authorization
-          in: header
-          description: Bearer JWT auth
-          required: false
-          schema:
-            type: string
       requestBody:
         description: Created user object
         content:
@@ -51,7 +44,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDTO'
+                $ref: '#/components/schemas/ResponseContainerUserResponseDTO'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     get:
@@ -62,13 +55,6 @@ paths:
       summary: Retrieve a list of users
       description: This can only be done by the logged in user.
       operationId: retrieveAllUsers
-      parameters:
-        - name: Authorization
-          in: header
-          description: Bearer JWT auth
-          required: false
-          schema:
-            type: string
       responses:
         default:
           description: successful operation
@@ -106,19 +92,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDTO'
+                $ref: '#/components/schemas/ResponseContainerUserResponseDTO'
   /users/logout:
     get:
       tags:
         - user
+      security:
+        - bearerAuth: []
       summary: Retrieve a list of users
       description: This can only be done by the logged in user.
       operationId: logout
       parameters: 
-        - name: Authorization
-          in: header
-          description: Bearer JWT auth
-          required: false
+        - name: token
+          in: query
+          description: authentication token
+          required: true
           schema:
             type: string
       responses:
@@ -127,7 +115,46 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDTO'
+                $ref: '#/components/schemas/ResponseContainerUserResponseDTO'
+  /products/product:
+    post:
+      tags:
+        - store
+      security:
+        - bearerAuth: []
+      summary: Create product
+      description: This can only be done by the logged in user.
+      operationId: createProduct
+      requestBody:
+        description: Created product object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDTO'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerProductResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    get:
+      tags:
+        - store
+      security:
+        - bearerAuth: []
+      summary: Retrieve a list of users
+      description: This can only be done by the logged in user.
+      operationId: retrieveAllProducts
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListDTO'
 
 components:
   schemas:
@@ -182,12 +209,14 @@ components:
         id:
           type: integer
           format: int64
-          example: 10
+          example: 8
         name:
           type: string
           example: James
-        parentCategory:
-          $ref: '#/components/schemas/CategoryDTO'
+        parentCategoryId:
+          type: integer
+          format: int64
+          example: 1
         dateCreated:
           type: string
           format: date
@@ -205,19 +234,21 @@ components:
         id:
           type: integer
           format: int64
-          example: 10
+          example: 37
         name:
           type: string
-          example: James
+          example: Reloj Smart Samsung
         description:
           type: string
-          example: James
+          example: Reloj Smartwatch samsung Galaxy watch 4 
         price:
-          type: string
-          example: James
+          type: number
+          format: double
+          example: 7000
         qty:
-          type: string
-          example: James
+          type: number
+          example: 2
+          description: the stock quantity.
         category:
           $ref: '#/components/schemas/CategoryDTO'
         dateCreated:
@@ -234,6 +265,10 @@ components:
         - qty
         - category
         - dateCreated
+    ProductListDTO:
+      type: array
+      items: 
+        $ref: '#/components/schemas/ProductDTO'
     CartDTO:
       type: object
       properties: 
@@ -258,6 +293,52 @@ components:
       required: 
         - user
         - dateCreated
+    ErrorResponseDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/ErrorItemDTO'
+    ErrorItemDTO:
+      type: object
+      properties:
+        code:
+          type: string
+        link:
+          type: string
+        detail:
+          type: string
+    MetaInformationResponseDTO:
+      required:
+      - time
+      type: object
+      properties:
+        time:
+          type: integer
+          format: int64
+        refNumber:
+          type: string
+    ResponseContainerUserResponseDTO:
+      required:
+      - meta
+      type: object
+      properties:
+        errors:
+          $ref: '#/components/schemas/ErrorResponseDTO'
+        data:
+          $ref: '#/components/schemas/UserDTO'
+        meta:
+          $ref: '#/components/schemas/MetaInformationResponseDTO'
+    ResponseContainerProductResponseDTO:
+      required:
+      - meta
+      type: object
+      properties:
+        errors:
+          $ref: '#/components/schemas/ErrorResponseDTO'
+        data:
+          $ref: '#/components/schemas/ProductDTO'
+        meta:
+          $ref: '#/components/schemas/MetaInformationResponseDTO'
+          
   responses:
     UnauthorizedError:
       description: Access token is missing or invalid
@@ -266,7 +347,7 @@ components:
     bearerAuth:            # arbitrary name for the security scheme
       type: http
       scheme: bearer
-      bearerFormat: JWT
+      bearerFormat: JWT 
       
 security:
   - bearerAuth: []  
