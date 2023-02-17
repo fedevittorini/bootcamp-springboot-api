@@ -17,7 +17,7 @@ import com.eduit.bootcamp.springbootapi.service.UserAuthenticationService;
 
 public class UserController implements UsersApiDelegate {
 
-	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
 	private UserAdministrationService userAdministrationService;
 	private UserAuthenticationService userAuthenticationService;
@@ -29,13 +29,14 @@ public class UserController implements UsersApiDelegate {
 	}
 
 	public ResponseEntity<ResponseContainerUserResponseDTO> createUser(UserDTO userDTO) {
-		logger.debug("CREAR");
+		LOGGER.debug("CREAR");
 		ResponseContainerUserResponseDTO responseContainer = new ResponseContainerUserResponseDTO();
 		try {
 			UserDTO response = userAdministrationService.createUser(userDTO);
 			responseContainer.data(response);
 			return new ResponseEntity<ResponseContainerUserResponseDTO>(responseContainer, HttpStatus.CREATED);
 		} catch (Exception e) {
+			LOGGER.error("An error occurred creating a user", e);
 			List<ErrorItemDTO> errorList = new ArrayList<>();
 			ErrorItemDTO errorItem = new ErrorItemDTO();
 			errorItem.setCode("A2");
@@ -47,13 +48,19 @@ public class UserController implements UsersApiDelegate {
 	}
 	
 	public ResponseEntity<List<UserDTO>> retrieveAllUsers() {
-		logger.debug("LISTAR");
-		return new ResponseEntity<List<UserDTO>>(HttpStatus.CREATED);
+		LOGGER.debug("LISTAR");
+		try {
+			List<UserDTO> response = userAdministrationService.listUsers();
+			return new ResponseEntity<List<UserDTO>>(response, HttpStatus.CREATED);
+		} catch (Exception e) {
+			LOGGER.error("An error occurred listing users", e);
+			return new ResponseEntity<List<UserDTO>>(HttpStatus.BAD_REQUEST);
+		}
 	}
 	
 	public ResponseEntity<ResponseContainerUserResponseDTO> login(String username,
 	        String password) {
-		logger.debug("LOGIN");
+		LOGGER.debug("LOGIN");
 //		UserEntity usr = userAuthenticationService.login(username, password);
 //		
 //		String token = userAuthenticationService.getToken(usr.getId(), username);

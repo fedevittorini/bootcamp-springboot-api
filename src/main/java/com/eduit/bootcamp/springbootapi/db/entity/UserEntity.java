@@ -102,9 +102,6 @@ public class UserEntity {
 	 */
 	public void setPassword(String password) {
 		Validate.notBlank(password, "The password cannot be null or blank");
-		if (password.length() < 6 || password.length() > 12 ) {
-			throw new IllegalArgumentException("The password length should be between 6 an 12 chars length");
-		}
 		this.password = password;
 	}
 	

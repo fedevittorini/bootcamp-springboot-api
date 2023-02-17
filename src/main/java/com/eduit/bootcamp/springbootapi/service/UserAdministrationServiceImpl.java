@@ -1,9 +1,12 @@
 package com.eduit.bootcamp.springbootapi.service;
 
-import java.util.Date;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.eduit.bootcamp.springbootapi.db.entity.UserEntity;
 import com.eduit.bootcamp.springbootapi.db.repository.UserRepository;
@@ -11,60 +14,36 @@ import com.eduit.bootcamp.springbootapi.model.UserDTO;
 
 public class UserAdministrationServiceImpl implements UserAdministrationService {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserAdministrationServiceImpl.class);
+	
 	private UserRepository userRepository;
 	
-	public UserAdministrationServiceImpl(UserRepository theUserRepository) {
+	private UserMapper userMapper;
+	
+	public UserAdministrationServiceImpl(UserMapper theUserMapper, UserRepository theUserRepository) {
 		userRepository = theUserRepository;
+		userMapper = theUserMapper;
 	}
 
 	@Override
 	public UserDTO createUser(UserDTO theUser) {
-		UserEntity toCreate = mapUser(theUser);
+		Validate.notNull(theUser, "The user cannot be null.");
+		LOGGER.trace(String.format("Creating user with attributes: %s", theUser.toString()));
+		UserEntity toCreate = userMapper.mapUserEncoded(theUser);
 		UserEntity created = userRepository.save(toCreate);
-		return mapUser(created);
+		return userMapper.mapUser(created);
 	}
 
 	@Override
 	public List<UserDTO> listUsers() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	
-	private UserEntity mapUser(final UserDTO theUser) {
-		UserEntity response = new UserEntity();
-		response.setId(theUser.getId());
-		response.setUsername(theUser.getUsername());
-		response.setPassword(theUser.getPassword());
-		response.setFirstName(theUser.getFirstName());
-		response.setLastName(theUser.getLastName());
-		response.setEmail(theUser.getEmail());
-		if (theUser.getDateCreated() != null) {
-			response.setDateCreated(Date.from(theUser.getDateCreated().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+		LOGGER.trace(String.format("Listing all users"));
+		Iterable<UserEntity> users = userRepository.findAll();
+		Iterator<UserEntity> iter = users.iterator();
+		List<UserDTO> response = new ArrayList<>();
+		while (iter.hasNext()) {
+			response.add(userMapper.mapUser(iter.next()));
 		}
-		if (theUser.getDateDeleted() != null) {
-			response.setDateDeleted(Date.from(theUser.getDateDeleted().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-		}
-		
 		return response;
 	}
 	
-	private UserDTO mapUser(final UserEntity theUser) {
-		UserDTO response = new UserDTO();
-		response.setId(theUser.getId());
-		response.setUsername(theUser.getUsername());
-		response.setPassword(theUser.getPassword());
-		response.setFirstName(theUser.getFirstName());
-		response.setLastName(theUser.getLastName());
-		response.setEmail(theUser.getEmail());
-		if (theUser.getDateCreated() != null) {
-			response.setDateCreated(LocalDate.from(theUser.getDateCreated().toInstant()));
-		}
-		if (theUser.getDateDeleted() != null) {
-			response.setDateDeleted(LocalDate.from(theUser.getDateDeleted().toInstant()));
-		}
-		
-		return response;
-	}
-
 }

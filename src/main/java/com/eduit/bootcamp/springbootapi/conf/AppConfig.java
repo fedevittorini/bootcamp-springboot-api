@@ -1,18 +1,13 @@
 package com.eduit.bootcamp.springbootapi.conf;
 
-import java.security.SecureRandom;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.eduit.bootcamp.springbootapi.controller.ProductController;
@@ -22,6 +17,8 @@ import com.eduit.bootcamp.springbootapi.service.UserAdministrationService;
 import com.eduit.bootcamp.springbootapi.service.UserAdministrationServiceImpl;
 import com.eduit.bootcamp.springbootapi.service.UserAuthenticationService;
 import com.eduit.bootcamp.springbootapi.service.UserAuthenticationServiceImpl;
+import com.eduit.bootcamp.springbootapi.service.UserMapper;
+import com.eduit.bootcamp.springbootapi.service.UserMapperImpl;
 
 @Configuration
 public class AppConfig {
@@ -32,21 +29,7 @@ public class AppConfig {
 
 	@Autowired
 	ApplicationContext context;
-
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails user = User.withUsername("user")
-            .password(passwordEncoder.encode("password"))
-            .roles("USER")
-            .build();
-
-        UserDetails admin = User.withUsername("admin")
-            .password(passwordEncoder.encode("admin"))
-            .roles("USER", "ADMIN")
-            .build();
-
-        return new InMemoryUserDetailsManager(user, admin);
-    }
+    
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
@@ -56,9 +39,7 @@ public class AppConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-       int strength = 10; // work factor of bcrypt
-       BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(strength, new SecureRandom());
-        return encoder;
+        return new BCryptPasswordEncoder();
     }
     
 	@Bean
@@ -73,8 +54,14 @@ public class AppConfig {
 	}
 	
 	@Bean
-	public UserAdministrationService getUserAdministrationService(UserRepository userRepository) {
-		return new UserAdministrationServiceImpl(userRepository);
+	public UserMapper getUserMapper(PasswordEncoder encoder) {
+		return new UserMapperImpl(encoder);
+	}
+	
+	@Bean
+	public UserAdministrationService getUserAdministrationService(UserMapper userMapper, 
+			UserRepository userRepository) {
+		return new UserAdministrationServiceImpl(userMapper, userRepository);
 	}
 	
 	@Bean
