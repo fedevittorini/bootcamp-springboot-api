@@ -13,20 +13,17 @@ import com.eduit.bootcamp.springbootapi.model.ErrorItemDTO;
 import com.eduit.bootcamp.springbootapi.model.ResponseContainerUserResponseDTO;
 import com.eduit.bootcamp.springbootapi.model.UserDTO;
 import com.eduit.bootcamp.springbootapi.service.UserAdministrationService;
-import com.eduit.bootcamp.springbootapi.service.UserAuthenticationService;
 
 public class UserController implements UsersApiDelegate {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
 	private UserAdministrationService userAdministrationService;
-	private UserAuthenticationService userAuthenticationService;
 	
-	public UserController(UserAdministrationService theUserAdministrationService, 
-				UserAuthenticationService theUserAuthenticationService) {
-		userAuthenticationService = theUserAuthenticationService;
+	public UserController(UserAdministrationService theUserAdministrationService) {
 		userAdministrationService = theUserAdministrationService;
 	}
+
 
 	public ResponseEntity<ResponseContainerUserResponseDTO> createUser(UserDTO userDTO) {
 		LOGGER.debug("CREAR");
@@ -56,20 +53,6 @@ public class UserController implements UsersApiDelegate {
 			LOGGER.error("An error occurred listing users", e);
 			return new ResponseEntity<List<UserDTO>>(HttpStatus.BAD_REQUEST);
 		}
-	}
-	
-	public ResponseEntity<ResponseContainerUserResponseDTO> login(String username,
-	        String password) {
-		LOGGER.debug("LOGIN");
-//		UserEntity usr = userAuthenticationService.login(username, password);
-//		
-//		String token = userAuthenticationService.getToken(usr.getId(), username);
-//		UserDTO u = new UserDTO();
-//		u.setUsername(username);
-//		MultiValueMap<String, String> headers = new HttpHeaders();
-//		headers.add("X-Auth-Token", token);
-//		ResponseEntity<UserDTO> response = new ResponseEntity<UserDTO>(u, headers, HttpStatus.CREATED);
-		return new ResponseEntity<ResponseContainerUserResponseDTO>(HttpStatus.ACCEPTED);
 	}
 	
 }

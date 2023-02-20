@@ -1,12 +1,15 @@
 package com.eduit.bootcamp.springbootapi.db.entity;
 
+import java.util.Collection;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.Validate;
@@ -44,6 +47,9 @@ public class UserEntity {
 	
 	@Column(nullable = false)
 	private String password;
+	
+	@ManyToMany(fetch = FetchType.EAGER)
+	private Collection<RoleEntity> roles;
 	
 	@Column(name = "date_created", nullable = false)
 	private Date dateCreated;
@@ -111,6 +117,14 @@ public class UserEntity {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public Collection<RoleEntity> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Collection<RoleEntity> roles) {
+		this.roles = roles;
 	}
 
 	public Date getDateCreated() {

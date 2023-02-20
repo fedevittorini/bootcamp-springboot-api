@@ -1,38 +1,31 @@
 package com.eduit.bootcamp.springbootapi.service;
 
-import java.util.Optional;
+import java.util.Map;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import com.eduit.bootcamp.springbootapi.db.entity.UserEntity;
-import com.eduit.bootcamp.springbootapi.db.repository.UserRepository;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
 
 public class UserAuthenticationServiceImpl implements UserAuthenticationService {
 
-	private UserRepository userRepository;
+	private JWTService jwtService;
+	private AuthenticationManager authenticationManager;
 
-	private PasswordEncoder encoder;
-	
-	public UserAuthenticationServiceImpl(final String theSecret,
-			PasswordEncoder theEncoder,
-			UserRepository theUserRepository) {
-		userRepository = theUserRepository;
-		encoder = theEncoder;
+		
+	public UserAuthenticationServiceImpl(AuthenticationManager theAuthenticationManager, JWTService theJwtService) {
+		authenticationManager = theAuthenticationManager;
+		jwtService = theJwtService;
 	}
 
+
 	@Override
-	public String login(String username, String password) {
-		Optional<UserEntity> opUsr = userRepository.findOneByUsername(username);
-		if (opUsr.isEmpty()) {
-			throw new RuntimeException("User not found");
-		}
-		UserEntity ret = opUsr.get();
-		System.out.print(encoder.encode(password));
-		if (encoder.matches(password, ret.getPassword())) {
-			return ret.getUsername();
-		}	
-		
-		throw new RuntimeException("password missmatch");
+	public Map<String, String> login(String username, String password) {
+		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+		Authentication authResult = authenticationManager.authenticate(authenticationToken);
+		User user = (User) authResult.getPrincipal();
+		Map<String, String> tokens = jwtService.generateTokenSet(user);
+		return tokens;
 	}
 
 }

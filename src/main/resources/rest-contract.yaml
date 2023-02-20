@@ -22,6 +22,8 @@ tags:
     description: Access to the store
   - name: user
     description: Operations about user
+  - name: login
+    description: Operations about login
 paths:
   /users/user:
     post:
@@ -30,14 +32,14 @@ paths:
       security:
         - bearerAuth: []
       summary: Create user
-      description: This can only be done by the logged in user.
+      description: Create a user, authentication required.
       operationId: createUser
       requestBody:
         description: Created user object
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserDTO'
+              $ref: '#/components/schemas/UserRequestDTO'
       responses:
         '200':
           description: successful operation
@@ -53,7 +55,7 @@ paths:
       security:
         - bearerAuth: []
       summary: Retrieve a list of users
-      description: This can only be done by the logged in user.
+      description: Retrieve a list of users, authentication required.
       operationId: retrieveAllUsers
       responses:
         default:
@@ -62,49 +64,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserListDTO'
-  /users/login:
+  /token/refresh:
     get:
       tags:
-        - user
-      summary: Retrieve a list of users
-      description: This can only be done by the logged in user.
-      operationId: login
+        - login
+      security:
+        - bearerAuth: []
+      summary: refresh a token
+      description: Refresh a token, authentication required.
+      operationId: refreshToken
       parameters: 
-        - name: username
-          in: query
-          description: authentication token
-          required: true
-          schema:
-            type: string
-        - name: password
-          in: query
+        - name: Authorization
+          in: header
           description: authentication token
           required: true
           schema:
             type: string
       responses:
-        default:
+        200:
           description: successful operation
           headers: 
-            Authorization:
+            Access-Token:
+              schema:
+                type: string
+            Refresh-Token:
               schema:
                 type: string
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseContainerUserResponseDTO'
-  /users/logout:
-    get:
+  /token/logout:
+    post:
       tags:
-        - user
+        - login
       security:
         - bearerAuth: []
-      summary: Retrieve a list of users
-      description: This can only be done by the logged in user.
+      summary: Destroy created session
+      description:  Destroy created session, authentication required.
       operationId: logout
       parameters: 
-        - name: token
-          in: query
+        - name: Authorization
+          in: header
           description: authentication token
           required: true
           schema:
@@ -112,6 +113,41 @@ paths:
       responses:
         default:
           description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerUserResponseDTO'
+  /token/login:
+    post:
+      tags:
+        - login
+      summary: Create a user session
+      description: Create a user session
+      operationId: login
+      parameters: 
+        - name: username
+          in: query
+          description: the username to authenticate
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: the password to authenticate
+          required: true
+          schema:
+            type: string
+            format: password
+      responses:
+        200:
+          description: successful operation
+          headers: 
+            Access-Token:
+              schema:
+                type: string
+            Refresh-Token:
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -123,7 +159,7 @@ paths:
       security:
         - bearerAuth: []
       summary: Create product
-      description: This can only be done by the logged in user.
+      description: Create a product, authentication required.
       operationId: createProduct
       requestBody:
         description: Created product object
@@ -145,8 +181,8 @@ paths:
         - store
       security:
         - bearerAuth: []
-      summary: Retrieve a list of users
-      description: This can only be done by the logged in user.
+      summary: Retrieve a list of products
+      description: Retrieve a list of products, authentication required.
       operationId: retrieveAllProducts
       responses:
         default:
@@ -158,6 +194,34 @@ paths:
 
 components:
   schemas:
+    UserRequestDTO:
+      type: object
+      properties:
+        username:
+          type: string
+          example: theUser
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        email:
+          type: string
+          format: email
+          example: john@email.com
+          description: this field represent the user email
+        password:
+          type: string
+          maxLength: 16
+          minLength: 6
+          example: 'p4$sW0rD!'
+      required: 
+        - username
+        - firstName
+        - lastName
+        - email
+        - password
     UserDTO:
       type: object
       properties:
@@ -293,6 +357,15 @@ components:
       required: 
         - user
         - dateCreated
+    JWTResponse:
+      type: object
+      properties: 
+        user:
+          $ref: '#/components/schemas/UserDTO'
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
     ErrorResponseDTO:
       type: array
       items:
@@ -344,10 +417,10 @@ components:
       description: Access token is missing or invalid
       
   securitySchemes:
-    bearerAuth:            # arbitrary name for the security scheme
+    bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT 
+      bearerFormat: JWT
       
 security:
   - bearerAuth: []  
