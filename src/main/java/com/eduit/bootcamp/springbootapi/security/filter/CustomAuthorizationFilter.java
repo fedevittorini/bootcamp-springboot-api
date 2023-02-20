@@ -22,7 +22,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.eduit.bootcamp.springbootapi.conf.SwaggerWebConfig;
+import com.eduit.bootcamp.springbootapi.conf.SecurityConfig;
 import com.eduit.bootcamp.springbootapi.service.utils.JwtTokenUtil;
 import com.fasterxml.jackson.core.exc.StreamWriteException;
 import com.fasterxml.jackson.databind.DatabindException;

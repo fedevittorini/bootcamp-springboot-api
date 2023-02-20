@@ -2,28 +2,33 @@ package com.eduit.bootcamp.springbootapi.service;
 
 import java.util.Map;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserAuthenticationServiceImpl implements UserAuthenticationService {
 
 	private JWTService jwtService;
-	private AuthenticationManager authenticationManager;
-
+	private PasswordEncoder passwordEncoder;
+	private UserDetailsService userDetailService;
+	
 		
-	public UserAuthenticationServiceImpl(AuthenticationManager theAuthenticationManager, JWTService theJwtService) {
-		authenticationManager = theAuthenticationManager;
+	public UserAuthenticationServiceImpl(PasswordEncoder thePasswordEncoder, JWTService theJwtService,
+			UserDetailsService theUserDetailsService) {
+		passwordEncoder = thePasswordEncoder;
 		jwtService = theJwtService;
+		userDetailService = theUserDetailsService;
 	}
 
 
 	@Override
 	public Map<String, String> login(String username, String password) {
-		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-		Authentication authResult = authenticationManager.authenticate(authenticationToken);
-		User user = (User) authResult.getPrincipal();
+		UserDetails optUser = userDetailService.loadUserByUsername(username);
+		if (!passwordEncoder.matches(password, optUser.getPassword())) {
+			throw new RuntimeException("The passwords doesn't match");
+		}
+		User user = (User) optUser;
 		Map<String, String> tokens = jwtService.generateTokenSet(user);
 		return tokens;
 	}

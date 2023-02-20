@@ -3,6 +3,7 @@ package com.eduit.bootcamp.springbootapi.service;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -45,5 +46,4 @@ public class UserAdministrationServiceImpl implements UserAdministrationService 
 		}
 		return response;
 	}
-	
 }
