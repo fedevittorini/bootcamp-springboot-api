@@ -1,6 +1,5 @@
 package com.eduit.bootcamp.springbootapi.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -9,12 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.eduit.bootcamp.springbootapi.api.UsersApiDelegate;
-import com.eduit.bootcamp.springbootapi.model.ErrorItemDTO;
-import com.eduit.bootcamp.springbootapi.model.ResponseContainerUserResponseDTO;
+import com.eduit.bootcamp.springbootapi.model.ResponseContainerResponseDTO;
 import com.eduit.bootcamp.springbootapi.model.UserDTO;
+import com.eduit.bootcamp.springbootapi.model.UserListDTO;
 import com.eduit.bootcamp.springbootapi.service.UserAdministrationService;
 
-public class UserController implements UsersApiDelegate {
+public class UserController extends BaseController implements UsersApiDelegate {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
@@ -25,33 +24,35 @@ public class UserController implements UsersApiDelegate {
 	}
 
 
-	public ResponseEntity<ResponseContainerUserResponseDTO> createUser(UserDTO userDTO) {
+	public ResponseEntity<ResponseContainerResponseDTO> createUser(UserDTO userDTO) {
+		Long start = System.currentTimeMillis();
 		LOGGER.debug("CREAR");
-		ResponseContainerUserResponseDTO responseContainer = new ResponseContainerUserResponseDTO();
+		ResponseContainerResponseDTO responseContainer = new ResponseContainerResponseDTO();
 		try {
 			UserDTO response = userAdministrationService.createUser(userDTO);
 			responseContainer.data(response);
-			return new ResponseEntity<ResponseContainerUserResponseDTO>(responseContainer, HttpStatus.CREATED);
+			responseContainer.setMeta(buildMeta(start));
+			return ResponseEntity.status(HttpStatus.CREATED).body(responseContainer);
 		} catch (Exception e) {
-			LOGGER.error("An error occurred creating a user", e);
-			List<ErrorItemDTO> errorList = new ArrayList<>();
-			ErrorItemDTO errorItem = new ErrorItemDTO();
-			errorItem.setCode("A2");
-			errorItem.setDetail(e.getMessage());
-			errorList.add(errorItem);
-			responseContainer.errors(errorList);
-			return new ResponseEntity<ResponseContainerUserResponseDTO>(responseContainer, HttpStatus.BAD_REQUEST);
+			LOGGER.error(String.format("An error occurred creating a user: \"%s\" ", userDTO), e);
+			return buildErrorResponse(responseContainer, HttpStatus.BAD_REQUEST, e, "A1", start);
 		}
 	}
 	
-	public ResponseEntity<List<UserDTO>> retrieveAllUsers() {
+	public ResponseEntity<ResponseContainerResponseDTO> retrieveAllUsers() {
+		Long start = System.currentTimeMillis();
 		LOGGER.debug("LISTAR");
+		ResponseContainerResponseDTO responseContainer = new ResponseContainerResponseDTO();
 		try {
-			List<UserDTO> response = userAdministrationService.listUsers();
-			return new ResponseEntity<List<UserDTO>>(response, HttpStatus.CREATED);
+			List<UserDTO> listUser = userAdministrationService.listUsers();
+			UserListDTO response = new UserListDTO();
+			response.setItems(listUser);
+			responseContainer.data(response);
+			responseContainer.setMeta(buildMeta(start));
+			return ResponseEntity.status(HttpStatus.CREATED).body(responseContainer);
 		} catch (Exception e) {
-			LOGGER.error("An error occurred listing users", e);
-			return new ResponseEntity<List<UserDTO>>(HttpStatus.BAD_REQUEST);
+			LOGGER.error(String.format("An error occurred listing uses"), e);
+			return buildErrorResponse(responseContainer, HttpStatus.BAD_REQUEST, e, "A1", start);
 		}
 	}
 	

@@ -9,11 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.eduit.bootcamp.springbootapi.api.TokenApiDelegate;
-import com.eduit.bootcamp.springbootapi.model.ResponseContainerUserResponseDTO;
+import com.eduit.bootcamp.springbootapi.model.JWTResponseDTO;
+import com.eduit.bootcamp.springbootapi.model.ResponseContainerResponseDTO;
 import com.eduit.bootcamp.springbootapi.service.JWTService;
 import com.eduit.bootcamp.springbootapi.service.UserAuthenticationService;
 
-public class TokenController implements TokenApiDelegate {
+public class TokenController extends BaseController implements TokenApiDelegate {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TokenController.class);
 
@@ -26,31 +27,41 @@ public class TokenController implements TokenApiDelegate {
 		jwtService = theJwtService;
 	}
 
-	public ResponseEntity<ResponseContainerUserResponseDTO> login(String username,
+	public ResponseEntity<ResponseContainerResponseDTO> login(String username,
 	        String password) {
-		LOGGER.debug("refreshToken");
+		Long start = System.currentTimeMillis();
+		LOGGER.debug("login");
+		ResponseContainerResponseDTO response = new ResponseContainerResponseDTO();
 		try {
 			Map<String, String> tokens = userAuthenticationService.login(username, password);
 			HttpHeaders headers = new HttpHeaders();
 			tokens.forEach((k, v) -> headers.add(k, v));
-			return ResponseEntity.status(HttpStatus.ACCEPTED).headers(headers).build();
+			JWTResponseDTO jwtResponse = new JWTResponseDTO();
+			jwtResponse.setAccessToken(tokens.get(JWTService.ACCESS_TOKEN_HEADER));
+			jwtResponse.setRefreshToken(tokens.get(JWTService.REFRESH_TOKEN_HEADER));
+			response.setData(jwtResponse);
+			response.setMeta(buildMeta(start));
+			return ResponseEntity.status(HttpStatus.ACCEPTED).headers(headers).body(response);
 		} catch (Exception e) {
 			LOGGER.error(String.format("Login failed for user: \"%s\" pwd: \"%s\" ", username, password), e);
+			return buildErrorResponse(response, HttpStatus.BAD_REQUEST, e, "A1", start);
 		}
-		return ResponseEntity.status(HttpStatus.ACCEPTED).build();
-	}
-	
-	public ResponseEntity<ResponseContainerUserResponseDTO> logout(String authorization) {
-		LOGGER.debug("refreshToken");
-		return ResponseEntity.status(HttpStatus.ACCEPTED).build();
 	}
 
-	public ResponseEntity<ResponseContainerUserResponseDTO> refreshToken(String authorization) {
+	public ResponseEntity<ResponseContainerResponseDTO> refreshToken(String authorization) {
+		Long start = System.currentTimeMillis();
+		ResponseContainerResponseDTO response = new ResponseContainerResponseDTO();
 		LOGGER.debug("refreshToken");
-		Map<String, String> tokens = jwtService.validateRefreshToken(authorization);
-		HttpHeaders headers = new HttpHeaders();
-		tokens.forEach((k, v) -> headers.add(k, v));
-		return ResponseEntity.status(HttpStatus.ACCEPTED).headers(headers).build();
+		try {
+			Map<String, String> tokens = jwtService.validateRefreshToken(authorization);
+			HttpHeaders headers = new HttpHeaders();
+			tokens.forEach((k, v) -> headers.add(k, v));
+			return ResponseEntity.status(HttpStatus.ACCEPTED).headers(headers).build();
+		} catch (Exception e) {
+			LOGGER.error(String.format("refreshToken failed for token: \"%s\" ", authorization), e);
+			return buildErrorResponse(response, HttpStatus.BAD_REQUEST, e, "A1", start);
+		}
 	}
-	
+
+
 }
