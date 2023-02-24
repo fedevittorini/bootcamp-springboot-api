@@ -64,7 +64,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseContainerResponseDTO'
-  /users/user/{id}:
+  /users/user/{userId}:
     put:
       tags:
         - user
@@ -74,7 +74,7 @@ paths:
       description: Update a user, authentication required.
       operationId: updateUser
       parameters: 
-        - name: id
+        - name: userId
           in: path
           description: the user id
           required: true
@@ -105,7 +105,7 @@ paths:
       description: Delete a user, authentication required.
       operationId: deleteUser
       parameters: 
-        - name: id
+        - name: userId
           in: path
           description: the user id
           required: true
@@ -136,7 +136,7 @@ paths:
       description: Retrieve a user, authentication required.
       operationId: retrieveUser
       parameters: 
-        - name: id
+        - name: userId
           in: path
           description: the user id
           required: true
@@ -150,7 +150,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseContainerResponseDTO'
-  /users/user/{user_id}/roles:
+  /users/user/{userId}/roles:
     get:
       tags:
         - user
@@ -160,7 +160,7 @@ paths:
       description: Retrieve the roles from a user, authentication required.
       operationId: getUserRoles
       parameters: 
-        - name: user_id
+        - name: userId
           in: path
           description: the user id
           required: true
@@ -176,7 +176,7 @@ paths:
                 $ref: '#/components/schemas/ResponseContainerResponseDTO'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-  /users/user/{user_id}/role/{role_id}:
+  /users/user/{userId}/role/{roleId}:
     post:
       tags:
         - user
@@ -186,16 +186,16 @@ paths:
       description: Add a role to a user, authentication required.
       operationId: addRoleToUser
       parameters: 
-        - name: user_id
+        - name: userId
           in: path
           description: the user id
           required: true
           schema:
             type: integer
             format: int64
-        - name: role_id
+        - name: roleId
           in: path
-          description: the user id
+          description: the role id
           required: true
           schema:
             type: integer
@@ -218,16 +218,16 @@ paths:
       description: Remove a role from a user, authentication required.
       operationId: removeRoleToUser
       parameters: 
-        - name: user_id
+        - name: userId
           in: path
           description: the user id
           required: true
           schema:
             type: integer
             format: int64
-        - name: role_id
+        - name: roleId
           in: path
-          description: the user id
+          description: the role id
           required: true
           schema:
             type: integer
@@ -348,7 +348,7 @@ paths:
   /products/product:
     post:
       tags:
-        - store
+        - backoffice
       security:
         - bearerAuth: []
       summary: Create product
@@ -362,7 +362,151 @@ paths:
               $ref: '#/components/schemas/ProductDTO'
       responses:
         '200':
-          description: successful operation
+          description: successful operation response a ProductDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    get:
+      tags:
+        - backoffice
+      security:
+        - bearerAuth: []
+      summary: Retrieve a list of products
+      description: Retrieve a list of products, authentication required.
+      operationId: retrieveAllProducts
+      responses:
+        default:
+          description: successful operation response a ProductListDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+  /products/product/{productId}:
+    put:
+      tags:
+        - backoffice
+      security:
+        - bearerAuth: []
+      summary: Update product
+      description: Update a product, authentication required.
+      operationId: updateProduct
+      parameters: 
+        - name: productId
+          in: path
+          description: the product id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Updated product object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDTO'
+      responses:
+        '200':
+          description: successful operation response a ProductDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    delete:
+      tags:
+        - backoffice
+      security:
+        - bearerAuth: []
+      summary: Delete product
+      description: Delete a product, authentication required.
+      operationId: deleteProduct
+      parameters: 
+        - name: productId
+          in: path
+          description: the product id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation response a EmptyResponseDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    get:
+      tags:
+        - backoffice
+      security:
+        - bearerAuth: []
+      summary: Retrieve product
+      description: Retrieve a product, authentication required.
+      operationId: retrieveProduct
+      parameters: 
+        - name: productId
+          in: path
+          description: the product id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation response a ProductDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+  /carts/cart:
+    post:
+      tags:
+        - store
+      security:
+        - bearerAuth: []
+      summary: Create cart
+      description: Create a cart, authentication required.
+      operationId: createCart
+      requestBody:
+        description: Created cart object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartDTO'
+      responses:
+        '200':
+          description: successful operation response a CartDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /carts/cart/{cartId}:
+    delete:
+      tags:
+        - store
+      security:
+        - bearerAuth: []
+      summary: Delete cart
+      description: Delete a cart, authentication required.
+      operationId: deleteCart
+      parameters: 
+        - name: cartId
+          in: path
+          description: the cartId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation response a EmptyResponseDTO as data
           content:
             application/json:
               schema:
@@ -374,17 +518,125 @@ paths:
         - store
       security:
         - bearerAuth: []
-      summary: Retrieve a list of products
-      description: Retrieve a list of products, authentication required.
-      operationId: retrieveAllProducts
+      summary: Retrieve cart
+      description: Retrieve a cart, authentication required.
+      operationId: retrieveCart
+      parameters: 
+        - name: cartId
+          in: path
+          description: the cartId
+          required: true
+          schema:
+            type: string
       responses:
-        default:
-          description: successful operation
+        '200':
+          description: successful operation response a CartDTO as data
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ResponseContainerResponseDTO'
-
+  /carts/cart/{cartId}/buy:
+    delete:
+      tags:
+        - store
+      security:
+        - bearerAuth: []
+      summary: Buy cart
+      description: Buy a cart, authentication required.
+      operationId: buyCart
+      parameters: 
+        - name: cartId
+          in: path
+          description: the cartId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation response a OrderDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+  /carts/cart/{cartId}/items:
+    put:
+      tags:
+        - store
+      security:
+        - bearerAuth: []
+      summary: Add a product to the cart
+      description: Add a product to the cart, authentication required.
+      operationId: addToCart
+      parameters: 
+        - name: cartId
+          in: path
+          description: the cartId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The product to be added.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCartDTO'
+      responses:
+        '200':
+          description: successful operation response a CartDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    delete:
+      tags:
+        - store
+      security:
+        - bearerAuth: []
+      summary: Delete products from cart
+      description: Delete products from cart, authentication required.
+      operationId: deleteFromCart
+      parameters: 
+        - name: cartId
+          in: path
+          description: the cartId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation response a EmptyResponseDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    get:
+      tags:
+        - store
+      security:
+        - bearerAuth: []
+      summary: Retrieve products in cart
+      description: Retrieve products in cart, authentication required.
+      operationId: retrieveProductsInCart
+      parameters: 
+        - name: cartId
+          in: path
+          description: the cartId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation response a ProductCartListDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
 components:
   schemas:
     UserRequestDTO:
@@ -577,6 +829,53 @@ components:
           items: 
             $ref: '#/components/schemas/ProductDTO'
     CartDTO:
+      type: object
+      properties: 
+        id:
+          type: integer
+          format: int64
+          example: 10
+        user:
+          $ref: '#/components/schemas/UserDTO'
+        product_list:
+          type: array
+          items: 
+            $ref: '#/components/schemas/ProductDTO'
+        dateCreated:
+          type: string
+          format: date
+          example: '2023-02-01'
+        dateDeleted:
+          type: string
+          format: date
+          example: '2023-02-01'
+      required: 
+        - user
+        - dateCreated
+    ProductCartDTO:
+      type: object
+      properties:
+        cart:
+          $ref: '#/components/schemas/CartDTO'
+        product:
+          $ref: '#/components/schemas/ProductDTO'
+        qty:
+          type: integer
+          example: 2
+          description: the stock quantity.
+      required: 
+        - cart_id
+        - dateCreated
+    ProductCartListDTO:
+      type: object
+      properties:
+        cart:
+          $ref: '#/components/schemas/CartDTO'
+        products:
+          type: array
+          items: 
+            $ref: '#/components/schemas/ProductCartDTO'
+    OrderDTO:
       type: object
       properties: 
         id:
