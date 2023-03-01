@@ -41,11 +41,14 @@ public class SecurityConfig {
     public SecurityFilterChain getSecurityFilterChain(HttpSecurity http, CustomAuthorizationFilter customAuthorizationFilter,
     		@Value("${api.basePath}") String basePath) throws Exception {
     	http.csrf().disable();
-        http.formLogin().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests().antMatchers(basePath + "/users/**").hasAnyAuthority("ROLE_USER");
         http.authorizeRequests().antMatchers(basePath + "/products/**").hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(basePath + "/carts/**").hasAnyAuthority("ROLE_USER");
+        http.authorizeRequests().antMatchers(basePath + "/token/login").permitAll();
+        http.authorizeRequests().antMatchers("/swagger-ui/**").permitAll();
         http.authorizeRequests().antMatchers("/v3/api-docs").permitAll();
+        http.authorizeRequests().antMatchers("/v3/api-docs.yaml").permitAll();
         http.authorizeRequests().anyRequest().permitAll();
         http.addFilterBefore(customAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
     	return http.build();

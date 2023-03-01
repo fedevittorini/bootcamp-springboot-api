@@ -1,0 +1,175 @@
+package com.eduit.bootcamp.springbootapi.controller;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import javax.validation.Valid;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.ApplicationContext;
+import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
+
+import com.eduit.bootcamp.springbootapi.db.entity.RoleEntity;
+import com.eduit.bootcamp.springbootapi.db.entity.UserEntity;
+import com.eduit.bootcamp.springbootapi.db.repository.RoleRepository;
+import com.eduit.bootcamp.springbootapi.db.repository.UserRepository;
+import com.eduit.bootcamp.springbootapi.model.ErrorItemDTO;
+import com.eduit.bootcamp.springbootapi.model.JWTResponseDTO;
+import com.eduit.bootcamp.springbootapi.model.ResponseContainerResponseDTO;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment=WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+public class TokenControllerIntegrationTest {
+
+	@Autowired
+    private ApplicationContext context;
+	
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	private TestRestTemplate template;
+	
+    @LocalServerPort
+    private int randomServerPort;
+    
+    @Value("${api.basePath}") 
+    private String basePath;
+	
+	private PasswordEncoder encoder;
+	
+	private UserRepository userRepository;
+	
+	private RoleRepository roleRepository;
+	
+	private String baseUrl;
+	
+	@BeforeAll
+	public static void setupClass(){
+
+	}
+	
+	@BeforeEach
+	public void setup() throws Exception {
+		encoder = context.getBean(PasswordEncoder.class);
+		userRepository = context.getBean(UserRepository.class);
+		roleRepository = context.getBean(RoleRepository.class);
+		baseUrl = "http://localhost:" + randomServerPort + basePath;
+		
+		assertEquals(userRepository.count(), 0);
+		assertEquals(roleRepository.count(), 0);
+	}
+	
+	@AfterEach
+	public void destroy() {
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, UserEntity.ROLE_RELATION_TABLE_NAME, UserEntity.TABLE_NAME, RoleEntity.TABLE_NAME);
+	}
+	
+	@Test
+	public void testUserLogin_OK() {
+		RoleEntity role = new RoleEntity();
+		role.setName("ROLE_ADMIN");
+		role.setLevel(999);
+		role.setDateCreated(new Date());
+		roleRepository.save(role);
+		
+		UserEntity user = new UserEntity();
+		user.setEmail("test@test.com");
+		user.setFirstName("Pedro");
+		user.setLastName("Gomez");
+		user.setUsername("pedrito");
+		user.setRoles(Arrays.asList(role));
+		user.setPassword(encoder.encode("123"));
+		user.setDateCreated(new Date());
+		userRepository.save(user);
+		
+		ResponseEntity<ResponseContainerResponseDTO> response = template.postForEntity(baseUrl + "/token/login?username=pedrito&password=123",
+				null, ResponseContainerResponseDTO.class);
+		assertNotNull(response);
+		ResponseContainerResponseDTO entity = response.getBody();
+		assertNull(entity.getErrors());
+		
+		JWTResponseDTO data = (JWTResponseDTO) entity.getData();
+		assertNotNull(data);
+		assertNotNull(data.getAccessToken());
+		assertNotNull(data.getRefreshToken());
+	}
+	
+	
+	@Test
+	public void testUserLogin_invalidPasswordOK() {
+		RoleEntity role = new RoleEntity();
+		role.setName("ROLE_ADMIN");
+		role.setLevel(999);
+		role.setDateCreated(new Date());
+		roleRepository.save(role);
+		
+		UserEntity user = new UserEntity();
+		user.setEmail("test@test.com");
+		user.setFirstName("Pedro");
+		user.setLastName("Gomez");
+		user.setUsername("pedrito");
+		user.setRoles(Arrays.asList(role));
+		user.setPassword(encoder.encode("888"));
+		user.setDateCreated(new Date());
+		userRepository.save(user);
+		
+		ResponseEntity<ResponseContainerResponseDTO> response = template.postForEntity(baseUrl + "/token/login?username=pedrito&password=123",
+				null, ResponseContainerResponseDTO.class);
+		assertNotNull(response);
+		ResponseContainerResponseDTO entity = response.getBody();
+		List<ErrorItemDTO> errorList = entity.getErrors();
+		assertEquals(errorList.size(), 1);
+		ErrorItemDTO error = errorList.get(0);
+		assertNotNull(error);
+		assertEquals(error.getDetail(), "The passwords doesn't match");
+		assertNull(entity.getData());
+	}
+	
+	@Test
+	public void testUserLogin_invalidUserOK() {
+
+		UserEntity user = new UserEntity();
+		user.setEmail("test@test.com");
+		user.setFirstName("Pedro");
+		user.setLastName("Gomez");
+		user.setUsername("ped");
+		user.setPassword(encoder.encode("888"));
+		user.setDateCreated(new Date());
+		userRepository.save(user);
+		
+		ResponseEntity<ResponseContainerResponseDTO> response = template.postForEntity(baseUrl + "/token/login?username=pedrito&password=123",
+				null, ResponseContainerResponseDTO.class);
+		assertNotNull(response);
+		ResponseContainerResponseDTO entity = response.getBody();
+		List<ErrorItemDTO> errorList = entity.getErrors();
+		assertEquals(errorList.size(), 1);
+		ErrorItemDTO error = errorList.get(0);
+		assertNotNull(error);
+		assertEquals(error.getDetail(), "User not found");
+		assertNull(entity.getData());
+	}
+	
+}

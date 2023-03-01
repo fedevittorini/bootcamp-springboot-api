@@ -25,6 +25,8 @@ import org.apache.commons.lang3.Validate;
 public class UserEntity {
 
 	public static final String TABLE_NAME = "users";
+	
+	public static final String ROLE_RELATION_TABLE_NAME = "users_roles";
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	/**

@@ -22,14 +22,14 @@ import com.eduit.bootcamp.springbootapi.utils.DateUtils;
 @RunWith(JUnit4.class)
 public class UserMapperTest {
 
-	private UserMapper userMapper;
+	private UserMapper target;
 	
 	private PasswordEncoder encoder;
 	
 	@BeforeEach
 	public void setupClass() {
 		encoder = mock(BCryptPasswordEncoder.class);
-		userMapper = new UserMapperImpl(encoder);
+		target = new UserMapperImpl(encoder);
 	}
 	
 	@Test
@@ -42,7 +42,7 @@ public class UserMapperTest {
 		dto.setPassword("123");
 		dto.setDateCreated(LocalDate.now());
 		
-		UserEntity response = userMapper.mapUser(dto);
+		UserEntity response = target.mapUser(dto);
 		
 		assertNotNull(response);
 		assertEquals(response.getUsername(), dto.getUsername());
@@ -69,7 +69,7 @@ public class UserMapperTest {
 		
 		when(encoder.encode(eq(pwd))).thenReturn(encPwd);
 		
-		UserEntity response = userMapper.mapUserEncoded(dto);
+		UserEntity response = target.mapUserEncoded(dto);
 		
 		assertNotNull(response);
 		assertEquals(response.getUsername(), dto.getUsername());
@@ -95,7 +95,7 @@ public class UserMapperTest {
 		
 		Exception retrievedEx = null;
 		try {
-			userMapper.mapUserEncoded(dto);
+			target.mapUserEncoded(dto);
 		} catch (Exception e) {
 			retrievedEx = e;
 		} 
