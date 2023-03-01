@@ -89,21 +89,7 @@ public class TokenControllerIntegrationTest {
 	
 	@Test
 	public void testUserLogin_OK() {
-		RoleEntity role = new RoleEntity();
-		role.setName("ROLE_ADMIN");
-		role.setLevel(999);
-		role.setDateCreated(new Date());
-		roleRepository.save(role);
-		
-		UserEntity user = new UserEntity();
-		user.setEmail("test@test.com");
-		user.setFirstName("Pedro");
-		user.setLastName("Gomez");
-		user.setUsername("pedrito");
-		user.setRoles(Arrays.asList(role));
-		user.setPassword(encoder.encode("123"));
-		user.setDateCreated(new Date());
-		userRepository.save(user);
+		createUser("pedrito", "123", "ROLE_ADMIN");
 		
 		ResponseEntity<ResponseContainerResponseDTO> response = template.postForEntity(baseUrl + "/token/login?username=pedrito&password=123",
 				null, ResponseContainerResponseDTO.class);
@@ -117,24 +103,9 @@ public class TokenControllerIntegrationTest {
 		assertNotNull(data.getRefreshToken());
 	}
 	
-	
 	@Test
 	public void testUserLogin_invalidPasswordOK() {
-		RoleEntity role = new RoleEntity();
-		role.setName("ROLE_ADMIN");
-		role.setLevel(999);
-		role.setDateCreated(new Date());
-		roleRepository.save(role);
-		
-		UserEntity user = new UserEntity();
-		user.setEmail("test@test.com");
-		user.setFirstName("Pedro");
-		user.setLastName("Gomez");
-		user.setUsername("pedrito");
-		user.setRoles(Arrays.asList(role));
-		user.setPassword(encoder.encode("888"));
-		user.setDateCreated(new Date());
-		userRepository.save(user);
+		createUser("pedrito", "888");
 		
 		ResponseEntity<ResponseContainerResponseDTO> response = template.postForEntity(baseUrl + "/token/login?username=pedrito&password=123",
 				null, ResponseContainerResponseDTO.class);
@@ -150,15 +121,7 @@ public class TokenControllerIntegrationTest {
 	
 	@Test
 	public void testUserLogin_invalidUserOK() {
-
-		UserEntity user = new UserEntity();
-		user.setEmail("test@test.com");
-		user.setFirstName("Pedro");
-		user.setLastName("Gomez");
-		user.setUsername("ped");
-		user.setPassword(encoder.encode("888"));
-		user.setDateCreated(new Date());
-		userRepository.save(user);
+		createUser("martin", "888", "ROLE_ADMIN", false);
 		
 		ResponseEntity<ResponseContainerResponseDTO> response = template.postForEntity(baseUrl + "/token/login?username=pedrito&password=123",
 				null, ResponseContainerResponseDTO.class);
@@ -172,4 +135,35 @@ public class TokenControllerIntegrationTest {
 		assertNull(entity.getData());
 	}
 	
+	private void createUser(String username, String password) {
+		createUser(username, password, "ROLE_ADMIN");
+	}
+	
+	private void createUser(String username, String password, String roleName) {
+		createUser(username, password, "ROLE_ADMIN", true);
+	}
+	
+	private void createUser(String username, String password, String roleName, Boolean hasRole) {
+		RoleEntity role = null;
+		if (hasRole) {
+			role = new RoleEntity();
+			role.setName(roleName);
+			role.setLevel(999);
+			role.setDateCreated(new Date());
+			roleRepository.save(role);	
+		}
+		
+		
+		UserEntity user = new UserEntity();
+		user.setEmail("test@test.com");
+		user.setFirstName("Pedro");
+		user.setLastName("Gomez");
+		user.setUsername(username);
+		if (hasRole) {
+			user.setRoles(Arrays.asList(role));
+		}
+		user.setPassword(encoder.encode(password));
+		user.setDateCreated(new Date());
+		userRepository.save(user);
+	}
 }
