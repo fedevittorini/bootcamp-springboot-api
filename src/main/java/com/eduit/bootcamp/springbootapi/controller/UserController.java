@@ -11,6 +11,7 @@ import com.eduit.bootcamp.springbootapi.api.UsersApiDelegate;
 import com.eduit.bootcamp.springbootapi.model.ResponseContainerResponseDTO;
 import com.eduit.bootcamp.springbootapi.model.UserDTO;
 import com.eduit.bootcamp.springbootapi.model.UserListDTO;
+import com.eduit.bootcamp.springbootapi.model.UserRequestDTO;
 import com.eduit.bootcamp.springbootapi.service.UserAdministrationService;
 
 public class UserController extends BaseController implements UsersApiDelegate {
@@ -24,12 +25,12 @@ public class UserController extends BaseController implements UsersApiDelegate {
 	}
 
 
-	public ResponseEntity<ResponseContainerResponseDTO> createUser(UserDTO userDTO) {
+	public ResponseEntity<ResponseContainerResponseDTO> createUser(UserRequestDTO userDTO) {
 		Long start = System.currentTimeMillis();
 		LOGGER.debug("CREAR");
 		ResponseContainerResponseDTO responseContainer = new ResponseContainerResponseDTO();
 		try {
-			UserDTO response = userAdministrationService.createUser(userDTO);
+			UserDTO response = userAdministrationService.create(userDTO);
 			responseContainer.data(response);
 			responseContainer.setMeta(buildMeta(start));
 			return ResponseEntity.status(HttpStatus.CREATED).body(responseContainer);
@@ -44,7 +45,7 @@ public class UserController extends BaseController implements UsersApiDelegate {
 		LOGGER.debug("LISTAR");
 		ResponseContainerResponseDTO responseContainer = new ResponseContainerResponseDTO();
 		try {
-			List<UserDTO> listUser = userAdministrationService.listUsers();
+			List<UserDTO> listUser = userAdministrationService.retrieveAll();
 			UserListDTO response = new UserListDTO();
 			response.setItems(listUser);
 			responseContainer.data(response);

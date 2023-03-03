@@ -3,7 +3,6 @@ package com.eduit.bootcamp.springbootapi.service;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -12,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import com.eduit.bootcamp.springbootapi.db.entity.UserEntity;
 import com.eduit.bootcamp.springbootapi.db.repository.UserRepository;
 import com.eduit.bootcamp.springbootapi.model.UserDTO;
+import com.eduit.bootcamp.springbootapi.model.UserRequestDTO;
+import com.eduit.bootcamp.springbootapi.service.mapper.UserMapper;
 
 public class UserAdministrationServiceImpl implements UserAdministrationService {
 
@@ -27,23 +28,41 @@ public class UserAdministrationServiceImpl implements UserAdministrationService 
 	}
 
 	@Override
-	public UserDTO createUser(UserDTO theUser) {
-		Validate.notNull(theUser, "The user cannot be null.");
-		LOGGER.trace(String.format("Creating user with attributes: %s", theUser.toString()));
-		UserEntity toCreate = userMapper.mapUserEncoded(theUser);
-		UserEntity created = userRepository.save(toCreate);
-		return userMapper.mapUser(created);
-	}
-
-	@Override
-	public List<UserDTO> listUsers() {
+	public List<UserDTO> retrieveAll() throws RuntimeException {
 		LOGGER.trace(String.format("Listing all users"));
 		Iterable<UserEntity> users = userRepository.findAll();
 		Iterator<UserEntity> iter = users.iterator();
 		List<UserDTO> response = new ArrayList<>();
 		while (iter.hasNext()) {
-			response.add(userMapper.mapUser(iter.next()));
+			response.add(userMapper.map(iter.next()));
 		}
 		return response;
+	}
+
+	@Override
+	public UserDTO retrieve(Long id) throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserDTO create(UserRequestDTO theUser) throws RuntimeException {
+		Validate.notNull(theUser, "The user cannot be null.");
+		LOGGER.trace(String.format("Creating user with attributes: %s", theUser.toString()));
+		UserEntity toCreate = userMapper.mapEncoded(theUser);
+		UserEntity created = userRepository.save(toCreate);
+		return userMapper.map(created);
+	}
+
+	@Override
+	public UserDTO update(UserDTO element) throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void delete(Long id) throws RuntimeException {
+		// TODO Auto-generated method stub
+		
 	}
 }

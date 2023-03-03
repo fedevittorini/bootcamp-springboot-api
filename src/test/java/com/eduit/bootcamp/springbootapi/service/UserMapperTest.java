@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.eduit.bootcamp.springbootapi.db.entity.UserEntity;
 import com.eduit.bootcamp.springbootapi.model.UserDTO;
+import com.eduit.bootcamp.springbootapi.service.mapper.UserMapper;
+import com.eduit.bootcamp.springbootapi.service.mapper.UserMapperImpl;
 import com.eduit.bootcamp.springbootapi.utils.DateUtils;
 
 @RunWith(JUnit4.class)
@@ -42,7 +44,7 @@ public class UserMapperTest {
 		dto.setPassword("123");
 		dto.setDateCreated(LocalDate.now());
 		
-		UserEntity response = target.mapUser(dto);
+		UserEntity response = target.map(dto);
 		
 		assertNotNull(response);
 		assertEquals(response.getUsername(), dto.getUsername());
@@ -69,7 +71,7 @@ public class UserMapperTest {
 		
 		when(encoder.encode(eq(pwd))).thenReturn(encPwd);
 		
-		UserEntity response = target.mapUserEncoded(dto);
+		UserEntity response = target.mapEncoded(dto);
 		
 		assertNotNull(response);
 		assertEquals(response.getUsername(), dto.getUsername());
@@ -95,7 +97,7 @@ public class UserMapperTest {
 		
 		Exception retrievedEx = null;
 		try {
-			target.mapUserEncoded(dto);
+			target.mapEncoded(dto);
 		} catch (Exception e) {
 			retrievedEx = e;
 		} 

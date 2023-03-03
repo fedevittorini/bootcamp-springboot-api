@@ -31,7 +31,7 @@ public abstract class BaseController {
 	
 	protected MetaInformationResponseDTO buildMeta(final Long startTime) {
 		MetaInformationResponseDTO meta = new MetaInformationResponseDTO();
-		 Long endTime = System.nanoTime();
+		 Long endTime = System.currentTimeMillis();
 		 Long elapsedTime = endTime - startTime;
 		meta.setTime(elapsedTime);
 		return meta;

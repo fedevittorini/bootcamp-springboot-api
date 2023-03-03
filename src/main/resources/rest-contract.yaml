@@ -359,7 +359,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductDTO'
+              $ref: '#/components/schemas/ProductRequestDTO'
       responses:
         '200':
           description: successful operation response a ProductDTO as data
@@ -460,6 +460,125 @@ paths:
       responses:
         '200':
           description: successful operation response a ProductDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+  /products/category:
+    post:
+      tags:
+        - backoffice
+      security:
+        - bearerAuth: []
+      summary: Create category
+      description: Create a category, authentication required.
+      operationId: createCategory
+      requestBody:
+        description: Created category object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryRequestDTO'
+      responses:
+        '200':
+          description: successful operation response a CategoryDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    get:
+      tags:
+        - backoffice
+      security:
+        - bearerAuth: []
+      summary: Retrieve a list of category
+      description: Retrieve a list of category, authentication required.
+      operationId: retrieveAllCategory
+      responses:
+        default:
+          description: successful operation response a CategoryListDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+  /products/category/{categoryId}:
+    put:
+      tags:
+        - backoffice
+      security:
+        - bearerAuth: []
+      summary: Update category
+      description: Update a category, authentication required.
+      operationId: updateCategory
+      parameters: 
+        - name: categoryId
+          in: path
+          description: the category id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Updated category object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDTO'
+      responses:
+        '200':
+          description: successful operation response a CategoryDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    delete:
+      tags:
+        - backoffice
+      security:
+        - bearerAuth: []
+      summary: Delete category
+      description: Delete a category, authentication required.
+      operationId: deleteCategory
+      parameters: 
+        - name: categoryId
+          in: path
+          description: the category id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation response a EmptyResponseDTO as data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseContainerResponseDTO'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    get:
+      tags:
+        - backoffice
+      security:
+        - bearerAuth: []
+      summary: Retrieve category
+      description: Retrieve a category, authentication required.
+      operationId: retrieveCategory
+      parameters: 
+        - name: categoryId
+          in: path
+          description: the category id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation response a CategoryDTO as data
           content:
             application/json:
               schema:
@@ -784,6 +903,18 @@ components:
       required: 
         - name
         - dateCreated
+    CategoryRequestDTO:
+      type: object
+      properties: 
+        name:
+          type: string
+          example: James
+        parentCategoryId:
+          type: integer
+          format: int64
+          example: 1
+      required: 
+        - name
     ProductDTO:
       type: object
       properties:
@@ -821,6 +952,30 @@ components:
         - qty
         - category
         - dateCreated
+    ProductRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Reloj Smart Samsung
+        description:
+          type: string
+          example: Reloj Smartwatch samsung Galaxy watch 4 
+        price:
+          type: number
+          format: double
+          example: 7000
+        qty:
+          type: integer
+          example: 2
+          description: the stock quantity.
+        category:
+          $ref: '#/components/schemas/CategoryDTO'
+      required: 
+        - name
+        - price
+        - qty
+        - category
     ProductListDTO:
       type: object
       properties: 
