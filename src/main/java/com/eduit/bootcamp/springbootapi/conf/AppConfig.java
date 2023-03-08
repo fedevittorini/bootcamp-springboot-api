@@ -23,6 +23,8 @@ import com.eduit.bootcamp.springbootapi.service.UserAdministrationServiceImpl;
 import com.eduit.bootcamp.springbootapi.service.UserAuthenticationService;
 import com.eduit.bootcamp.springbootapi.service.UserAuthenticationServiceImpl;
 import com.eduit.bootcamp.springbootapi.service.UserDetailServiceImpl;
+import com.eduit.bootcamp.springbootapi.service.UserInitializationService;
+import com.eduit.bootcamp.springbootapi.service.UserInitializationServiceImpl;
 import com.eduit.bootcamp.springbootapi.service.mapper.CategoryMapper;
 import com.eduit.bootcamp.springbootapi.service.mapper.CategoryMapperImpl;
 import com.eduit.bootcamp.springbootapi.service.mapper.ProductMapper;
@@ -91,7 +93,7 @@ public class AppConfig {
 	@Bean
 	public CategoryAdministrationService getCategoryAdministrationService(CategoryMapper categoryMapper, 
 			CategoryRepository categoryRepository) {
-		return new CategoryAdministrationServiceImpl();
+		return new CategoryAdministrationServiceImpl(categoryMapper, categoryRepository);
 	}
 	
 	@Bean
@@ -99,6 +101,13 @@ public class AppConfig {
 			ProductRepository productRepository) {
 		return new ProductAdministrationServiceImpl(productMapper, productRepository);
 	}
+	
+	@Bean
+	public UserInitializationService getUserInitializationService(PasswordEncoder passwordEncoder, 
+			UserRepository userRepository) {
+		return new UserInitializationServiceImpl(passwordEncoder, userRepository);
+	}
+	
 	
     @Bean
     public PasswordEncoder passwordEncoder() {

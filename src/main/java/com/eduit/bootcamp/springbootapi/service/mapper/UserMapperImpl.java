@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.eduit.bootcamp.springbootapi.db.entity.UserEntity;
+import com.eduit.bootcamp.springbootapi.db.entity.UserRoleEnum;
 import com.eduit.bootcamp.springbootapi.model.UserDTO;
+import com.eduit.bootcamp.springbootapi.model.UserDTO.RoleEnum;
 import com.eduit.bootcamp.springbootapi.model.UserRequestDTO;
 import com.eduit.bootcamp.springbootapi.service.UserAdministrationServiceImpl;
 import com.eduit.bootcamp.springbootapi.utils.DateUtils;
@@ -33,6 +35,7 @@ public class UserMapperImpl implements UserMapper {
 		response.setFirstName(theUser.getFirstName());
 		response.setLastName(theUser.getLastName());
 		response.setEmail(theUser.getEmail());
+		response.setRole(UserRoleEnum.valueOf(theUser.getRole().getValue()));
 		if (theUser.getDateCreated() != null) {
 			response.setDateCreated(DateUtils.toDate(theUser.getDateCreated()));
 		}
@@ -52,6 +55,7 @@ public class UserMapperImpl implements UserMapper {
 		response.setFirstName(theUser.getFirstName());
 		response.setLastName(theUser.getLastName());
 		response.setEmail(theUser.getEmail());
+		response.setRole(RoleEnum.valueOf(theUser.getRole().name()));
 		if (theUser.getDateCreated() != null) {
 			LocalDate createdLocalDate = DateUtils.toLocalDate(theUser.getDateCreated());
 			response.setDateCreated(createdLocalDate);
@@ -73,6 +77,7 @@ public class UserMapperImpl implements UserMapper {
 		response.setFirstName(theUser.getFirstName());
 		response.setLastName(theUser.getLastName());
 		response.setEmail(theUser.getEmail());
+		response.setRole(UserRoleEnum.valueOf(theUser.getRole().getValue()));
 		if (theUser.getDateCreated() != null) {
 			response.setDateCreated(DateUtils.toDate(theUser.getDateCreated()));
 		}
@@ -91,6 +96,7 @@ public class UserMapperImpl implements UserMapper {
 		response.setFirstName(theUser.getFirstName());
 		response.setLastName(theUser.getLastName());
 		response.setEmail(theUser.getEmail());
+		response.setRole(UserRoleEnum.valueOf(theUser.getRole().getValue()));
 		response.setDateCreated(new Date());
 		return response;
 	}

@@ -3,11 +3,13 @@ package com.eduit.bootcamp.springbootapi.service;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eduit.bootcamp.springbootapi.db.entity.ProductEntity;
 import com.eduit.bootcamp.springbootapi.db.entity.UserEntity;
 import com.eduit.bootcamp.springbootapi.db.repository.UserRepository;
 import com.eduit.bootcamp.springbootapi.model.UserDTO;
@@ -41,8 +43,11 @@ public class UserAdministrationServiceImpl implements UserAdministrationService 
 
 	@Override
 	public UserDTO retrieve(Long id) throws RuntimeException {
-		// TODO Auto-generated method stub
-		return null;
+		Optional<UserEntity> opUser = userRepository.findById(id);
+		if (opUser.isEmpty()) {
+			throw new RuntimeException(String.format("The product could not be found under id %d", id));
+		}
+		return userMapper.map(opUser.get());
 	}
 
 	@Override

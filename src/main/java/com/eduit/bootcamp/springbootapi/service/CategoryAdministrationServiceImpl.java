@@ -22,21 +22,24 @@ public class CategoryAdministrationServiceImpl implements CategoryAdministration
 	
 private static final Logger LOGGER = LoggerFactory.getLogger(ProductAdministrationServiceImpl.class);
 	
-	private CategoryRepository productRepository;
+	private CategoryRepository categoryRepository;
 	
-	private CategoryMapper productMapper;
+	private CategoryMapper mapper;
 	
-	public CategoryAdministrationServiceImpl() {
+	public CategoryAdministrationServiceImpl(final CategoryMapper theCategoryMapper, 
+			final CategoryRepository theCategoryRepository) {
+		categoryRepository = theCategoryRepository;
+		mapper = theCategoryMapper;
 	}
 
 	@Override
 	public List<CategoryDTO> retrieveAll() throws RuntimeException {
 		LOGGER.trace(String.format("Listing all categories"));
-		Iterable<CategoryEntity> products = productRepository.findAll();
+		Iterable<CategoryEntity> products = categoryRepository.findAll();
 		Iterator<CategoryEntity> iter = products.iterator();
 		List<CategoryDTO> response = new ArrayList<>();
 		while (iter.hasNext()) {
-			response.add(productMapper.map(iter.next()));
+			response.add(mapper.map(iter.next()));
 		}
 		return response;
 	}

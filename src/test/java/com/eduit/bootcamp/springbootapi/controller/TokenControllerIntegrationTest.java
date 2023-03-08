@@ -4,11 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import javax.validation.Valid;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -30,9 +26,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
-import com.eduit.bootcamp.springbootapi.db.entity.RoleEntity;
 import com.eduit.bootcamp.springbootapi.db.entity.UserEntity;
-import com.eduit.bootcamp.springbootapi.db.repository.RoleRepository;
+import com.eduit.bootcamp.springbootapi.db.entity.UserRoleEnum;
 import com.eduit.bootcamp.springbootapi.db.repository.UserRepository;
 import com.eduit.bootcamp.springbootapi.model.ErrorItemDTO;
 import com.eduit.bootcamp.springbootapi.model.JWTResponseDTO;
@@ -62,8 +57,6 @@ public class TokenControllerIntegrationTest {
 	
 	private UserRepository userRepository;
 	
-	private RoleRepository roleRepository;
-	
 	private String baseUrl;
 	
 	@BeforeAll
@@ -75,18 +68,14 @@ public class TokenControllerIntegrationTest {
 	public void setup() throws Exception {
 		encoder = context.getBean(PasswordEncoder.class);
 		userRepository = context.getBean(UserRepository.class);
-		roleRepository = context.getBean(RoleRepository.class);
 		baseUrl = "http://localhost:" + randomServerPort + basePath;
-		
-		assertEquals(userRepository.count(), 0);
-		assertEquals(roleRepository.count(), 0);
 	}
 	
 	@AfterEach
 	public void destroy() {
-		JdbcTestUtils.deleteFromTables(jdbcTemplate, UserEntity.ROLE_RELATION_TABLE_NAME, UserEntity.TABLE_NAME, RoleEntity.TABLE_NAME);
+		JdbcTestUtils.deleteFromTables(jdbcTemplate, UserEntity.TABLE_NAME);
 	}
-	
+
 	@Test
 	public void testUserLogin_OK() {
 		createUser("pedrito", "123", "ROLE_ADMIN");
@@ -144,23 +133,13 @@ public class TokenControllerIntegrationTest {
 	}
 	
 	private void createUser(String username, String password, String roleName, Boolean hasRole) {
-		RoleEntity role = null;
-		if (hasRole) {
-			role = new RoleEntity();
-			role.setName(roleName);
-			role.setLevel(999);
-			role.setDateCreated(new Date());
-			roleRepository.save(role);	
-		}
-		
-		
 		UserEntity user = new UserEntity();
 		user.setEmail("test@test.com");
 		user.setFirstName("Pedro");
 		user.setLastName("Gomez");
 		user.setUsername(username);
 		if (hasRole) {
-			user.setRoles(Arrays.asList(role));
+			user.setRole(UserRoleEnum.valueOf(roleName));
 		}
 		user.setPassword(encoder.encode(password));
 		user.setDateCreated(new Date());
