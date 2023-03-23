@@ -104,8 +104,64 @@
 			<optional>true</optional>
 		</dependency>
 	</dependencies>
+	
 	<build>
+		<finalName>MiCarrito</finalName>
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.10</version>
+				<executions>
+					<execution>
+						<?m2e execute onConfiguration?>
+						<id>add-sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/main/java</source>
+								<source>target/generated-sources/openapi/gen/src/main/java</source>
+							</sources>
+						</configuration>
+					</execution>
+					<execution>
+						<?m2e execute onConfiguration?>
+						<id>add-test-sources</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/test/java</source>
+							</sources>
+						</configuration>
+					</execution>
+					<execution>
+						<?m2e execute onConfiguration?>
+						<id>add-integration-test-sources</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/integration-test/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -137,7 +193,7 @@
 								<annotationLibrary>swagger2</annotationLibrary>
 								<dateLibrary>java8</dateLibrary>
 								<delegatePattern>true</delegatePattern>
-			                	<sourceFolder>src/gen/java/main</sourceFolder>
+			                	<sourceFolder>gen/src/main/java</sourceFolder>
 			                </configOptions>
 			            </configuration>
 			        </execution>

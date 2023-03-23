@@ -57,8 +57,8 @@ public class DefaulLoginIntegrationTest {
 	@Test
 	public void testUserLogin_OK() {
 		
-		ResponseEntity<ResponseContainerResponseDTO> response = template.postForEntity(baseUrl + "/token/login?username=admin&password=admin",
-				null, ResponseContainerResponseDTO.class);
+		ResponseEntity<ResponseContainerResponseDTO> response = template.postForEntity(baseUrl 
+				+ "/token/login?username=admin&password=admin",	null, ResponseContainerResponseDTO.class);
 		assertNotNull(response);
 		ResponseContainerResponseDTO entity = response.getBody();
 		assertNull(entity.getErrors());
