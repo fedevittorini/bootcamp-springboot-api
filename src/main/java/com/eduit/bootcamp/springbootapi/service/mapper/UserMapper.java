@@ -33,4 +33,6 @@ public interface UserMapper {
 	UserEntity mapEncoded(final UserRequestDTO theUser);
 	
 	UserDTO map(final UserEntity theUser);
+	
+	UserEntity fill(final UserDTO source, final UserEntity target);
 }

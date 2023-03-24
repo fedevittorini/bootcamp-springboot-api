@@ -16,6 +16,12 @@ import com.eduit.bootcamp.springbootapi.model.UserDTO;
 import com.eduit.bootcamp.springbootapi.model.UserRequestDTO;
 import com.eduit.bootcamp.springbootapi.service.mapper.UserMapper;
 
+/**
+ * This is a service class in charge of administrate the Users without exposing the User Entity.
+ * 
+ * @author Federico Vittorini.
+ *
+ */
 public class UserAdministrationServiceImpl implements UserAdministrationService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserAdministrationServiceImpl.class);
@@ -60,9 +66,15 @@ public class UserAdministrationServiceImpl implements UserAdministrationService 
 	}
 
 	@Override
-	public UserDTO update(UserDTO element) throws RuntimeException {
-		// TODO Auto-generated method stub
-		return null;
+	public UserDTO update(UserDTO theUser) throws RuntimeException {
+		Optional<UserEntity> opUser = userRepository.findById(theUser.getId());
+		if (opUser.isEmpty()) {
+			throw new RuntimeException("The user does not exist");
+		}
+		UserEntity user = opUser.get();
+		UserEntity userFilled = userMapper.fill(theUser, user);
+		UserEntity userSaved = userRepository.save(userFilled);
+		return userMapper.map(userSaved);
 	}
 
 	@Override

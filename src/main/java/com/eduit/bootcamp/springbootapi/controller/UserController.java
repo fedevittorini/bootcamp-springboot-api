@@ -94,7 +94,7 @@ public class UserController extends BaseController implements UsersApiDelegate {
 		Long start = System.currentTimeMillis();
 		ResponseContainerResponseDTO responseContainer = new ResponseContainerResponseDTO();
 		if (userId != userDTO.getId()) {
-			LOGGER.error(String.format("Product id %d and inner id %d does not match", userId, userDTO.getId()));
+			LOGGER.error(String.format("User id %d and inner id %d does not match", userId, userDTO.getId()));
 			return buildErrorResponse(responseContainer, HttpStatus.BAD_REQUEST, null, "A1", start);
 		}
 		try {

@@ -42,9 +42,9 @@ public class SecurityConfig {
     		@Value("${api.basePath}") String basePath) throws Exception {
     	http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers(basePath + "/users/**").hasAnyAuthority("ROLE_USER");
+        http.authorizeRequests().antMatchers(basePath + "/users/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(basePath + "/products/**").hasAnyAuthority("ROLE_ADMIN");
-        http.authorizeRequests().antMatchers(basePath + "/carts/**").hasAnyAuthority("ROLE_USER");
+        http.authorizeRequests().antMatchers(basePath + "/carts/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeRequests().antMatchers(basePath + "/token/login").permitAll();
         http.authorizeRequests().antMatchers("/swagger-ui/**").permitAll();
         http.authorizeRequests().antMatchers("/v3/api-docs").permitAll();

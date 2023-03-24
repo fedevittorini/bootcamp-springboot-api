@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,7 +56,7 @@ public class UserMapperImpl implements UserMapper {
 		response.setFirstName(theUser.getFirstName());
 		response.setLastName(theUser.getLastName());
 		response.setEmail(theUser.getEmail());
-		response.setRole(RoleEnum.valueOf(theUser.getRole().name()));
+		response.setRole(RoleEnum.fromValue(theUser.getRole().name()));
 		if (theUser.getDateCreated() != null) {
 			LocalDate createdLocalDate = DateUtils.toLocalDate(theUser.getDateCreated());
 			response.setDateCreated(createdLocalDate);
@@ -99,5 +100,18 @@ public class UserMapperImpl implements UserMapper {
 		response.setRole(UserRoleEnum.valueOf(theUser.getRole().getValue()));
 		response.setDateCreated(new Date());
 		return response;
+	}
+
+	@Override
+	public UserEntity fill(final UserDTO source, final UserEntity target) {
+		target.setUsername(source.getUsername());
+		if (source.getPassword() != null && source.getPassword() != "") {
+			target.setPassword(encoder.encode(source.getPassword()));
+		}
+		target.setFirstName(source.getFirstName());
+		target.setLastName(source.getLastName());
+		target.setEmail(source.getEmail());
+		target.setRole(UserRoleEnum.valueOf(source.getRole().getValue()));
+		return target;
 	}
 }

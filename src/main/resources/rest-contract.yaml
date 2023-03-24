@@ -708,11 +708,11 @@ components:
           format: date
           example: '2023-02-01'
       required: 
+        - id
         - username
         - firstName
         - lastName
         - email
-        - password
         - role
         - dateCreated
     UserListDTO:
